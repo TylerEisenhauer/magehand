@@ -1,0 +1,24 @@
+{
+  "name": "magehand",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/TylerEisenhauer/magehand",
+  "author": "Tyler Eisenhauer",
+  "license": "MIT",
+  "scripts": {
+    "start": "tsc && NODE_ENV=development node src/index.js"
+  },
+  "dependencies": {
+    "axios": "^0.23.0",
+    "bufferutil": "^4.0.5",
+    "discord.js": "^13.2.0",
+    "dotenv": "^10.0.0",
+    "dotenv-flow": "^3.2.0",
+    "typescript": "^4.4.4",
+    "utf-8-validate": "^5.0.7",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.2"
+  }
+}
