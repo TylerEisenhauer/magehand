@@ -8,6 +8,4 @@ COPY .pnp.cjs .yarnrc.yml package.json tsconfig.json yarn.lock /app/
 
 RUN yarn
 
-# COPY . /app
-
 CMD ["yarn", "start"]
