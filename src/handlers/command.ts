@@ -1,10 +1,10 @@
 import {Message} from 'discord.js'
-import { ping } from '../commands/ping'
+import { newpc } from '../commands/newpc'
 
 export async function commandHandler(command: string, args: string[], message: Message) {
     switch (command) {
-        case 'ping':
-            return ping(message)
+        case 'newpc':
+            return newpc(message)
         default:
             return
     }

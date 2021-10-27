@@ -8,4 +8,4 @@ services:
 networks:
   default:
     external:
-      name: nukebot
+      name: magehand

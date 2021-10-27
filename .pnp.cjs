@@ -42,8 +42,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["dotenv", "npm:10.0.0"],
             ["dotenv-flow", "npm:3.2.0"],
             ["typescript", "patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=32657b"],
-            ["utf-8-validate", "npm:5.0.7"],
-            ["zlib-sync", "npm:0.1.7"]
+            ["utf-8-validate", "npm:5.0.7"]
           ],
           "linkType": "SOFT",
         }]
@@ -823,8 +822,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["dotenv", "npm:10.0.0"],
             ["dotenv-flow", "npm:3.2.0"],
             ["typescript", "patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=32657b"],
-            ["utf-8-validate", "npm:5.0.7"],
-            ["zlib-sync", "npm:0.1.7"]
+            ["utf-8-validate", "npm:5.0.7"]
           ],
           "linkType": "SOFT",
         }]
@@ -978,16 +976,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/ms-npm-2.1.3-81ff3cfac1-aa92de6080.zip/node_modules/ms/",
           "packageDependencies": [
             ["ms", "npm:2.1.3"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["nan", [
-        ["npm:2.15.0", {
-          "packageLocation": "./.yarn/unplugged/nan-npm-2.15.0-505c98ef4d/node_modules/nan/",
-          "packageDependencies": [
-            ["nan", "npm:2.15.0"],
-            ["node-gyp", "npm:8.3.0"]
           ],
           "linkType": "HARD",
         }]
@@ -1526,17 +1514,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/yallist-npm-4.0.0-b493d9e907-343617202a.zip/node_modules/yallist/",
           "packageDependencies": [
             ["yallist", "npm:4.0.0"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["zlib-sync", [
-        ["npm:0.1.7", {
-          "packageLocation": "./.yarn/unplugged/zlib-sync-npm-0.1.7-1ddfcf4171/node_modules/zlib-sync/",
-          "packageDependencies": [
-            ["zlib-sync", "npm:0.1.7"],
-            ["nan", "npm:2.15.0"],
-            ["node-gyp", "npm:8.3.0"]
           ],
           "linkType": "HARD",
         }]

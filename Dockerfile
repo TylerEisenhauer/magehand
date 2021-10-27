@@ -1,15 +1,10 @@
-FROM node:14.15.5-alpine3.10
+FROM node:16.12-alpine3.11
 
 WORKDIR /app
 
 COPY package.json yarn.lock /app/
 
-RUN apk add --no-cache --virtual .gyp \
-            python \
-            make \
-            g++ \
-    && yarn install \
-    && apk del .gyp
+RUN yarn set version berry && yarn install
 
 COPY . /app
 
