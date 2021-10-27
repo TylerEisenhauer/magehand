@@ -22,7 +22,7 @@ client.on('ready', async () => {
         status: 'online',
         activities: [
             {
-                name: 'D&D',
+                name: 'Dungeons and Dragons',
                 type: 'PLAYING'
             }
         ]
