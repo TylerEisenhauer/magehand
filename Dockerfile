@@ -2,10 +2,12 @@ FROM node:16.12-alpine3.11
 
 WORKDIR /app
 
-COPY package.json yarn.lock /app/
+COPY .yarn /app/.yarn
+COPY src /app/src
+COPY .pnp.cjs .yarnrc.yml package.json tsconfig.json yarn.lock /app/
 
-RUN yarn set version berry && yarn install
+RUN yarn
 
-COPY . /app
+# COPY . /app
 
 CMD ["yarn", "start"]
