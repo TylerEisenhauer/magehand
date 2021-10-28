@@ -15,6 +15,7 @@ export async function roll(message: Message, args: string[]) {
         const dieToRoll: number = parseInt(split[1])
 
         if (!allowedDie.includes(dieToRoll.toString())) return await message.channel.send(`Invalid die, please choose one of ${allowedDie}`)
+        if (numberToRoll > 100 || numberToRoll < 1) return await message.channel.send(`Invalid number of die to roll, please choose 1-100`)
 
         let rolls: number[] = []
         for (let i = 0; i < numberToRoll; i++) {
