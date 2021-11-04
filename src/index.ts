@@ -1,5 +1,6 @@
 import {Client, Intents, Message} from 'discord.js'
 import {config} from 'dotenv-flow'
+import { initializeMageHandClient } from './api/magehand'
 import { commandHandler } from './handlers/command'
 import { parseArgs } from './helpers/parsing'
 
@@ -18,6 +19,7 @@ const client = new Client({
 const prefix = '!'
 
 client.on('ready', async () => {
+    await initializeMageHandClient()
     await client.user.setPresence({
         status: 'online',
         activities: [
@@ -36,7 +38,7 @@ client.on('messageCreate', async (message: Message) => {
 
     const args: string[] = parseArgs(prefix, message.content)
     const command: string = args.shift().toLowerCase()
-
+    
     if (command.startsWith(prefix)) return
 
     await commandHandler(command, args, message)
