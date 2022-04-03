@@ -1,47 +1,58 @@
-import {Client, Intents, Message} from 'discord.js'
-import {config} from 'dotenv-flow'
-import { initializeMageHandClient } from './api/magehand'
-import { commandHandler } from './handlers/command'
-import { parseArgs } from './helpers/parsing'
+import { REST } from '@discordjs/rest'
+import { Client, Collection, Intents } from 'discord.js'
+import { Routes } from 'discord-api-types/v9'
+import { config } from 'dotenv-flow'
+import fs from 'node:fs'
+import path from 'node:path'
+
+import { ExtendedClient } from './types/extendedClient'
+import { ready } from './events/ready'
+import { Command } from './types/command'
+import { messageCreate } from './events/messageCreate'
+import { interactionCreate } from './events/interactionCreate'
 
 config()
 
-const client = new Client({
+const client: ExtendedClient = new Client({
     intents: [
-        Intents.FLAGS.GUILDS, 
-        Intents.FLAGS.GUILD_MESSAGES, 
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS, 
-        Intents.FLAGS.DIRECT_MESSAGES, 
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.DIRECT_MESSAGES,
         Intents.FLAGS.DIRECT_MESSAGE_REACTIONS
     ]
 })
+client.commands = new Collection()
 
-const prefix = '!'
+const commands = []
+const commandDirectory = path.join(__dirname, 'commands')
+const commandFiles = fs.readdirSync(commandDirectory).filter(file => file.endsWith('.js'))
 
-client.on('ready', async () => {
-    await initializeMageHandClient()
-    await client.user.setPresence({
-        status: 'online',
-        activities: [
-            {
-                name: 'Dungeons and Dragons',
-                type: 'PLAYING'
-            }
-        ]
-    })
-    console.log('Bot Online')
+for (const file of commandFiles) {
+    const command: Command = require(path.join(commandDirectory, file))
+    if (command.slashCommand) commands.push(command.slashCommand.toJSON())
+
+    client.commands.set(command.name, command)
+}
+
+client.on('ready', ready)
+client.on('messageCreate', messageCreate)
+client.on('interactionCreate', interactionCreate)
+
+client.login(process.env.DISCORD_TOKEN).then(() => {
+    console.log('Login Success')
+
+    const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN)
+    if (process.env.NODE_ENV === 'production') {
+        rest.put(Routes.applicationCommands(client.user.id), { body: commands })
+            .then(() => console.log('Successfully registered global application commands.'))
+            .catch(console.error)
+    } else {
+        const guildId = process.env.DEV_GUILD_ID
+        rest.put(Routes.applicationGuildCommands(client.user.id, guildId), { body: commands })
+            .then(() => console.log('Successfully registered application commands.'))
+            .catch(console.error)
+    }
+}).catch((e) => {
+    console.log(e)
 })
-
-client.on('messageCreate', async (message: Message) => {
-    if (message.author.bot) return
-    if (!message.content.startsWith(prefix)) return
-
-    const args: string[] = parseArgs(prefix, message.content)
-    const command: string = args.shift().toLowerCase()
-    
-    if (command.startsWith(prefix)) return
-
-    await commandHandler(command, args, message)
-})
-
-client.login(process.env.DISCORD_TOKEN)
