@@ -6,7 +6,7 @@
   "author": "Tyler Eisenhauer",
   "license": "MIT",
   "scripts": {
-    "start": "tsc && NODE_ENV=development node src/index.js"
+    "start": "tsc && node src/index.js"
   },
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
