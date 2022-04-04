@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
       args: [ "NODE_ENV=development" ]
-    env_file: .env
 
 networks:
   default:

@@ -2,7 +2,7 @@ import { Client } from 'discord.js'
 import { initializeMageHandClient } from '../api/magehand'
 
 export async function ready(client: Client) {
-    await initializeMageHandClient()
+    // await initializeMageHandClient()
     client.user.setPresence({
         status: 'online',
         activities: [
