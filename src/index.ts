@@ -10,6 +10,7 @@ import { ready } from './events/ready'
 import { Command } from './types/command'
 import { messageCreate } from './events/messageCreate'
 import { interactionCreate } from './events/interactionCreate'
+import { messageReactionAdd } from './events/messageReactionAdd'
 
 config()
 
@@ -20,7 +21,8 @@ const client: ExtendedClient = new Client({
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
         Intents.FLAGS.DIRECT_MESSAGES,
         Intents.FLAGS.DIRECT_MESSAGE_REACTIONS
-    ]
+    ],
+    partials: ['USER', 'REACTION', 'MESSAGE']
 })
 client.commands = new Collection()
 
@@ -37,6 +39,7 @@ for (const file of commandFiles) {
 
 client.on('ready', ready)
 client.on('messageCreate', messageCreate)
+client.on('messageReactionAdd', messageReactionAdd)
 client.on('interactionCreate', interactionCreate)
 
 client.login(process.env.DISCORD_TOKEN).then(() => {
