@@ -1,5 +1,5 @@
 import amqp from 'amqplib'
-import { Channel, Client, Guild, TextChannel } from 'discord.js'
+import { Client, Guild, MessageEmbed, TextChannel } from 'discord.js'
 
 import { initializeMageHandClient } from '../api/magehand'
 import { Session } from '../types/session'
@@ -35,7 +35,27 @@ async function startQueue(client: Client) {
             if (guild) {
                 const reminderChannel: TextChannel = await guild.channels.fetch(session.channel) as TextChannel
                 if (reminderChannel) {
-                    reminderChannel.send('You have a d&d session coming up')
+                    const mentions: string = session.participants.reduce((x, y,) => {
+                        return x + `<@${y}> `
+                    }, '')
+
+                    const embed: MessageEmbed = new MessageEmbed()
+                        .setColor(3447003)
+                        .setAuthor({
+                            name: `${session.name}`
+                        })
+                        .setDescription(session.description)
+                        .addFields(
+                            { name: 'Players Signed Up', value: mentions ? mentions : 'No players signed up' },
+                            { name: 'Location', value: session.location, inline: true },
+                            { name: 'Time', value: `<t:${+new Date(session.date) / 1000}:f>`, inline: true }
+                        )
+                        .setFooter({ text: `Session id | ${session._id}` })
+
+                    reminderChannel.send({
+                        content: 'Session Reminder',
+                        embeds: [embed]
+                    })
                 }
             }
             channel.ack(msg)
