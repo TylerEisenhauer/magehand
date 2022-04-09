@@ -2,9 +2,9 @@ import amqp from 'amqplib'
 import { Client, Guild, MessageEmbed, TextChannel } from 'discord.js'
 
 import { initializeMageHandClient } from '../api/magehand'
-import { Session } from '../types/session'
+import { Session } from '../types'
 
-export async function ready(client: Client) {
+export default async function ready(client: Client) {
     await initializeMageHandClient()
     client.user.setPresence({
         status: 'online',
@@ -40,7 +40,7 @@ async function startQueue(client: Client) {
                     }, '')
 
                     const embed: MessageEmbed = new MessageEmbed()
-                        .setColor(3447003)
+                        .setColor('#00FF00')
                         .setAuthor({
                             name: `${session.name}`
                         })

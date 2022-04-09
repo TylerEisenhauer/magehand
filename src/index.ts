@@ -5,12 +5,8 @@ import { config } from 'dotenv-flow'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { ExtendedClient } from './types/extendedClient'
-import { ready } from './events/ready'
-import { Command } from './types/command'
-import { messageCreate } from './events/messageCreate'
-import { interactionCreate } from './events/interactionCreate'
-import { messageReactionAdd } from './events/messageReactionAdd'
+import { interactionCreate, messageCreate, messageReactionAdd, messageReactionRemove, ready } from './events'
+import { ExtendedClient, Command } from './types'
 
 config()
 
@@ -40,6 +36,7 @@ for (const file of commandFiles) {
 client.on('ready', ready)
 client.on('messageCreate', messageCreate)
 client.on('messageReactionAdd', messageReactionAdd)
+client.on('messageReactionRemove', messageReactionRemove)
 client.on('interactionCreate', interactionCreate)
 
 client.login(process.env.DISCORD_TOKEN).then(() => {

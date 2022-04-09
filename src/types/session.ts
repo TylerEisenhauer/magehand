@@ -1,4 +1,4 @@
-export interface Session {
+export default interface Session {
     _id?: string
     cancelled?: boolean
     channel: string
@@ -6,6 +6,7 @@ export interface Session {
     description: string
     guild: string
     location: string
+    messageId?: string
     name: string
     participants?: string[]
     reminderSent?: boolean

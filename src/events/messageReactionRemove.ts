@@ -1,7 +1,7 @@
 import { MessageEmbed, MessageReaction, TextChannel, User } from 'discord.js'
-import { addParticipant, getSessionById } from '../api/magehand'
+import { getSessionById, removeParticipant } from '../api/magehand'
 
-export default async function messageReactionAdd(reaction: MessageReaction, user: User) {
+export default async function messageReactionRemove(reaction: MessageReaction, user: User) {
     if (user.bot) return
     if (reaction.partial) {
         try {
@@ -17,7 +17,7 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
             case '✅':
                 const session = await getSessionById(reaction.message.id)
                 if (!session || session.cancelled) return
-                const updatedSession = await addParticipant(reaction.message.id, user.id)
+                const updatedSession = await removeParticipant(reaction.message.id, user.id)
                 if (updatedSession) {
                     const messageChannel = await reaction.client.channels.fetch(session.channel) as TextChannel
                     const message = await messageChannel.messages.fetch(session.messageId)
@@ -40,7 +40,7 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
                         await message.edit({ embeds: [embed] })
                     }
                 }
-                await user.send(`You're signed up for the session ${updatedSession.name}`)
+                await user.send(`You're no longer signed up for the session ${session.name}`)
                 break
             case '❌':
                 console.log('deny')
@@ -51,4 +51,5 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
     } catch (e) {
         console.log(e)
     }
+
 }
