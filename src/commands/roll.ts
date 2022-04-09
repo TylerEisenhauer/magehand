@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
 import { CommandInteraction, Message } from 'discord.js'
 import { randomInteger } from '../helpers/numbers'
-import { Command } from '../types/command'
+import { Command } from '../types'
 
 const regex: RegExp = /((\d*)?d(\d+)([+-/*]\d+)?){1}/g
 const allowedDie: string[] = ['2', '4', '6', '8', '10', '12', '20', '100']

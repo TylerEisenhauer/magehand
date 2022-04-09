@@ -1,11 +1,11 @@
 import { Message } from 'discord.js'
 
 import { parseArgs } from '../helpers/parsing'
-import { ExtendedClient } from '../types/extendedClient'
+import { ExtendedClient } from '../types'
 
 const prefix = '!'
 
-export async function messageCreate(message: Message) {
+export default async function messageCreate(message: Message) {
     if (message.author.bot) return
     if (!message.content.startsWith(prefix)) return
     const client: ExtendedClient = message.client

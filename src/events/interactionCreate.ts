@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js'
-import { ExtendedClient } from '../types/extendedClient'
+import { ExtendedClient } from '../types'
 
-export async function interactionCreate(interaction: Interaction) {
+export default async function interactionCreate(interaction: Interaction) {
     if (!interaction.isCommand()) return
     const client: ExtendedClient = interaction.client
 
