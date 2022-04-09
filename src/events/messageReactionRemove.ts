@@ -43,7 +43,6 @@ export default async function messageReactionRemove(reaction: MessageReaction, u
                 await user.send(`You're no longer signed up for the session ${session.name}`)
                 break
             case '❌':
-                console.log('deny')
                 break
             default:
                 return

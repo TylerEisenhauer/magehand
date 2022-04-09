@@ -43,7 +43,6 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
                 await user.send(`You're signed up for the session ${updatedSession.name}`)
                 break
             case '❌':
-                console.log('deny')
                 break
             default:
                 return

@@ -19,6 +19,11 @@ const slashCommand = new SlashCommandBuilder()
                     .setName('name')
                     .setDescription('The name for the session')
                     .setRequired(true))
+            .addStringOption(option =>
+                option
+                    .setName('description')
+                    .setDescription('The description for the session')
+                    .setRequired(true))
             .addChannelOption(option =>
                 option
                     .setName('channel')
@@ -34,11 +39,6 @@ const slashCommand = new SlashCommandBuilder()
                 option
                     .setName('time')
                     .setDescription('The time for the session (24 hour format HH:MM)')
-                    .setRequired(true))
-            .addStringOption(option =>
-                option
-                    .setName('description')
-                    .setDescription('The description for the session')
                     .setRequired(true))
             .addStringOption(option =>
                 option
