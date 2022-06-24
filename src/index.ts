@@ -1,14 +1,14 @@
+import './config'
+
 import { REST } from '@discordjs/rest'
 import { Client, Collection, Intents } from 'discord.js'
 import { Routes } from 'discord-api-types/v9'
-import { config } from 'dotenv-flow'
 import fs from 'node:fs'
 import path from 'node:path'
 
 import { interactionCreate, messageCreate, messageReactionAdd, messageReactionRemove, ready } from './events'
+import { logger } from './logger'
 import { ExtendedClient, Command } from './types'
-
-config()
 
 const client: ExtendedClient = new Client({
     intents: [
@@ -40,19 +40,19 @@ client.on('messageReactionRemove', messageReactionRemove)
 client.on('interactionCreate', interactionCreate)
 
 client.login(process.env.DISCORD_TOKEN).then(() => {
-    console.log('Login Success')
+    logger.info('Discord Login Success')
 
     const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN)
     if (process.env.NODE_ENV === 'production') {
         rest.put(Routes.applicationCommands(client.user.id), { body: commands })
-            .then(() => console.log('Successfully registered global application commands.'))
-            .catch(console.error)
+            .then(() => logger.info('Successfully registered global application commands.'))
+            .catch(logger.error)
     } else {
         const guildId = process.env.DEV_GUILD_ID
         rest.put(Routes.applicationGuildCommands(client.user.id, guildId), { body: commands })
-            .then(() => console.log('Successfully registered application commands.'))
-            .catch(console.error)
+            .then(() => logger.info('Successfully registered application commands.'))
+            .catch(logger.error)
     }
 }).catch((e) => {
-    console.log(e)
+    logger.error(e)
 })

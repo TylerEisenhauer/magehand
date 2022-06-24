@@ -2,7 +2,9 @@ import { SlashCommandBuilder } from '@discordjs/builders'
 import { ChannelType } from 'discord-api-types/v9'
 import { CommandInteraction, Message, MessageEmbed, TextChannel } from 'discord.js'
 import { DateTime } from 'luxon'
+
 import { createSession, updateSession } from '../api/magehand'
+import { buildSessionEmbed } from '../helpers/embeds'
 
 import { timezoneOptions } from '../helpers/timezones'
 import { Command, Session } from '../types'
@@ -84,7 +86,7 @@ async function scheduleSession(interaction: CommandInteraction) {
     const timezone = interaction.options.getString('timezone')
 
     const parsedDate = DateTime.fromISO(`${date}T${time}`, { zone: timezone ?? 'America/Chicago' })
-    if (!parsedDate.isValid) return await interaction.reply({content: 'Invalid date or time provided', ephemeral: true})
+    if (!parsedDate.isValid) return await interaction.reply({ content: 'Invalid date or time provided', ephemeral: true })
 
     const session: Session = await createSession({
         channel,
@@ -97,17 +99,7 @@ async function scheduleSession(interaction: CommandInteraction) {
 
     await interaction.reply({ content: 'Session Scheduled!', ephemeral: true })
 
-    const embed: MessageEmbed = new MessageEmbed()
-        .setColor('#00FF00')
-        .setAuthor({
-            name: `${session.name}`
-        })
-        .setDescription(session.description)
-        .addFields(
-            { name: 'Location', value: session.location, inline: true },
-            { name: 'Time', value: `<t:${+new Date(session.date) / 1000}:f>`, inline: true }
-        )
-        .setFooter({ text: `Session id | ${session._id}` })
+    const embed: MessageEmbed = buildSessionEmbed(session)
 
     const alertChannel = await interaction.guild.channels.fetch(channel) as TextChannel
     const message = await alertChannel.send({ content: 'New session scheduled! React if you can make it', embeds: [embed] })
@@ -116,7 +108,7 @@ async function scheduleSession(interaction: CommandInteraction) {
         _id: session._id,
         messageId: message.id
     })
-    
+
     await message.react('✅')
     await message.react('❌')
 
@@ -137,9 +129,9 @@ async function cancelSession(interaction: CommandInteraction) {
             embed.setColor('#FF0000')
             await message.edit({ content: 'This session has been cancelled', embeds: [embed] })
         }
-        return await interaction.reply({content: 'Session canceled', ephemeral: true})
+        return await interaction.reply({ content: 'Session canceled', ephemeral: true })
     }
-    await interaction.reply({content: 'Could not find session, check your session id', ephemeral: true})
+    await interaction.reply({ content: 'Could not find session, check your session id', ephemeral: true })
 }
 
 async function execute(args: string[], message: Message) {

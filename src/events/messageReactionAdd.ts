@@ -1,5 +1,8 @@
 import { MessageEmbed, MessageReaction, TextChannel, User } from 'discord.js'
+
 import { addParticipant, getSessionById } from '../api/magehand'
+import { buildSessionEmbed } from '../helpers/embeds'
+import { logger } from '../logger'
 
 export default async function messageReactionAdd(reaction: MessageReaction, user: User) {
     if (user.bot) return
@@ -7,7 +10,7 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
         try {
             await reaction.fetch()
         } catch (e) {
-            console.error('Error fetching reaction')
+            logger.error('Error fetching reaction')
             return
         }
     }
@@ -22,21 +25,8 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
                     const messageChannel = await reaction.client.channels.fetch(session.channel) as TextChannel
                     const message = await messageChannel.messages.fetch(session.messageId)
                     if (message.editable) {
-                        const mentions: string = updatedSession.participants.reduce((x, y,) => {
-                            return x + `<@${y}> `
-                        }, '')
-                        const embed: MessageEmbed = new MessageEmbed()
-                            .setColor('#00FF00')
-                            .setAuthor({
-                                name: `${updatedSession.name}`
-                            })
-                            .setDescription(updatedSession.description)
-                            .addFields(
-                                { name: 'Players Signed Up', value: mentions ? mentions : 'No players signed up' },
-                                { name: 'Location', value: updatedSession.location, inline: true },
-                                { name: 'Time', value: `<t:${+new Date(updatedSession.date) / 1000}:f>`, inline: true }
-                            )
-                            .setFooter({ text: `Session id | ${updatedSession._id}` })
+                        const embed: MessageEmbed = buildSessionEmbed(updatedSession)
+                        
                         await message.edit({ embeds: [embed] })
                     }
                 }
@@ -48,6 +38,6 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
                 return
         }
     } catch (e) {
-        console.log(e)
+        logger.error(e)
     }
 }

@@ -1,6 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
 import { CommandInteraction, Message } from 'discord.js'
+
 import { randomInteger } from '../helpers/numbers'
+import { logger } from '../logger'
 import { Command } from '../types'
 
 const regex: RegExp = /((\d*)?d(\d+)([+-/*]\d+)?){1}/g
@@ -44,7 +46,7 @@ async function executeInteraction(interaction: CommandInteraction) {
         const result: string = rolls.join(',')
         return await interaction.reply(`[${result}] = ${rolls.reduce((x, y) => x + y)}`)
     } catch (ex) {
-        console.log(ex)
+        logger.error(ex)
         return await interaction.reply(`Exception thrown, check logs`)
     }
 }
@@ -71,7 +73,7 @@ async function execute(args: string[], message: Message) {
         const result: string = rolls.join(',')
         return await message.channel.send(`[${result}] = ${rolls.reduce((x, y) => x + y)}`)
     } catch (ex) {
-        console.log(ex)
+        logger.error(ex)
         return await message.channel.send(`Exception thrown, check logs`)
     }
 }

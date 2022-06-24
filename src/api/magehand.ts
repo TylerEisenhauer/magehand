@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 
+import { logger } from '../logger'
 import { Session, Settings } from '../types'
 
 let apiClient: AxiosInstance
@@ -13,7 +14,7 @@ async function getAuthToken(): Promise<string> {
 
         return `Bearer ${data.access_token}`
     } catch (e) {
-        console.log(e)
+        logger.error(e)
     }
     return null
 }

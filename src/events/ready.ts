@@ -1,7 +1,10 @@
 import amqp from 'amqplib'
 import { Client, Guild, MessageEmbed, TextChannel } from 'discord.js'
+import { operation } from 'retry'
 
 import { initializeMageHandClient } from '../api/magehand'
+import { buildSessionEmbed } from '../helpers/embeds'
+import { logger } from '../logger'
 import { Session } from '../types'
 
 export default async function ready(client: Client) {
@@ -16,53 +19,75 @@ export default async function ready(client: Client) {
         ]
     })
     startQueue(client)
-    console.log('Bot Online')
+    logger.info('Bot Online')
 }
 
 async function startQueue(client: Client) {
-    try {
-        const conn = await amqp.connect(process.env.QUEUE_CONNECTION)
+    const op = operation({
+        forever: true,
+        maxRetryTime: 60 * 1000 //1 minute
+    })
 
-        const channel = await conn.createConfirmChannel()
+    op.attempt(async (currentAttempt: number) => {
+        try {
+            logger.debug('Connecting to message queue')
+            const conn = await amqp.connect(process.env.QUEUE_CONNECTION)
 
-        await channel.assertQueue(process.env.SESSION_QUEUE_NAME, {
-            durable: true
-        })
+            logger.debug('Creating channel')
+            const channel = await conn.createConfirmChannel()
 
-        channel.consume(process.env.SESSION_QUEUE_NAME, async msg => {
-            const session: Session = JSON.parse(msg.content.toString())
-            const guild: Guild = await client.guilds.fetch(session.guild)
-            if (guild) {
-                const reminderChannel: TextChannel = await guild.channels.fetch(session.channel) as TextChannel
-                if (reminderChannel) {
-                    const mentions: string = session.participants.reduce((x, y,) => {
-                        return x + `<@${y}> `
-                    }, '')
+            logger.debug('Creating queue')
+            await channel.assertQueue(process.env.SESSION_QUEUE_NAME, {
+                durable: true
+            })
 
-                    const embed: MessageEmbed = new MessageEmbed()
-                        .setColor('#00FF00')
-                        .setAuthor({
-                            name: `${session.name}`
-                        })
-                        .setDescription(session.description)
-                        .addFields(
-                            { name: 'Players Signed Up', value: mentions ? mentions : 'No players signed up' },
-                            { name: 'Location', value: session.location, inline: true },
-                            { name: 'Time', value: `<t:${+new Date(session.date) / 1000}:f>`, inline: true }
-                        )
-                        .setFooter({ text: `Session id | ${session._id}` })
+            channel.on('close', () => {
+                channel.removeAllListeners()
+                logger.warn(`Channel closed`)
+            })
+            channel.on('error', (err) => {
+                channel.removeAllListeners()
+                logger.error(`Channel Error\n${err}`)
+            })
 
-                    reminderChannel.send({
-                        content: 'Session Reminder',
-                        embeds: [embed]
-                    })
+            channel.consume(process.env.SESSION_QUEUE_NAME, async msg => {
+                try {
+                    const session: Session = JSON.parse(msg.content.toString())
+                    const guild: Guild = await client.guilds.fetch(session.guild)
+                    if (guild) {
+                        const reminderChannel: TextChannel = await guild.channels.fetch(session.channel) as TextChannel
+                        if (reminderChannel) {
+                            const embed: MessageEmbed = buildSessionEmbed(session)
+
+                            reminderChannel.send({
+                                content: 'Session Reminder',
+                                embeds: [embed]
+                            })
+                        }
+                    }
+                    channel.ack(msg)
+                } catch (err) {
+                    logger.error(`Error processing message\n${err}`)
                 }
-            }
-            channel.ack(msg)
-        })
+            })
 
-        conn.on('close', () => setTimeout(() => startQueue(client), 1000))
-    } catch (e) {
-        console.log(e)
-    }
+            conn.on('close', () => {
+                logger.warn(`Connection closed`)
+                conn.removeAllListeners()
+                setTimeout(() => startQueue(client), 1000)
+            })
+            conn.on('error', (err) => {
+                logger.error(`Connection error\n${err}`)
+                conn.removeAllListeners()
+                setTimeout(() => startQueue(client), 1000)
+            })
+            conn.on('blocked', (reason) => { logger.error(`Connection blocked, reason:\n${reason}`) })
+            conn.on('unblocked', () => { logger.error(`Connection unblocked`) })
+
+            logger.info('Message queue connection sucessful')
+        } catch (error) {
+            logger.warn(`Error connecting to queue, retrying`)
+            op.retry(error)
+        }
+    })
 }
