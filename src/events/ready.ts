@@ -1,6 +1,7 @@
 import amqp from 'amqplib'
 import { Client, Guild, MessageEmbed, TextChannel } from 'discord.js'
 import { operation } from 'retry'
+import twilio from 'twilio'
 
 import { initializeMageHandClient } from '../api/magehand'
 import { buildSessionEmbed } from '../helpers/embeds'
@@ -84,8 +85,14 @@ async function startQueue(client: Client) {
             logger.info('Message queue connection sucessful')
         } catch (error) {
             logger.warn(`Error connecting to queue, retrying`)
-            if (op.retry(error)) {
-                // max retires reach, alert somehow???
+            if (!op.retry(error)) {
+                logger.error('Max queue connection attempts reached, sending alert')
+                const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+                twilioClient.messages.create({
+                    body: 'Magehand queue connection failed',
+                    from: process.env.TWILIO_FROM_NUMBER,
+                    to: process.env.TWILIO_TO_NUMBER
+                })
             }
         }
     })
