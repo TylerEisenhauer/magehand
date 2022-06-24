@@ -23,10 +23,7 @@ export default async function ready(client: Client) {
 }
 
 async function startQueue(client: Client) {
-    const op = operation({
-        forever: true,
-        maxRetryTime: 60 * 1000 //1 minute
-    })
+    const op = operation()
 
     op.attempt(async (currentAttempt: number) => {
         try {
@@ -87,7 +84,9 @@ async function startQueue(client: Client) {
             logger.info('Message queue connection sucessful')
         } catch (error) {
             logger.warn(`Error connecting to queue, retrying`)
-            op.retry(error)
+            if (op.retry(error)) {
+                // max retires reach, alert somehow???
+            }
         }
     })
 }
