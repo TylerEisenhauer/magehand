@@ -20,6 +20,9 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
             case '✅':
                 const session = await getSessionById(reaction.message.id)
                 if (!session || session.cancelled) return
+
+                if (session.participants.includes(user.id)) return
+
                 const updatedSession = await addParticipant(reaction.message.id, user.id)
                 if (updatedSession) {
                     const messageChannel = await reaction.client.channels.fetch(session.channel) as TextChannel

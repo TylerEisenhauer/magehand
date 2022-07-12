@@ -8,6 +8,7 @@ export default interface Session {
     location: string
     messageId?: string
     name: string
+    owner: string
     participants?: string[]
     reminderSent?: boolean
 }

@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios'
 
 import { logger } from '../logger'
 import { Session, Settings } from '../types'
+import Campaign from '../types/campaign'
 
 let apiClient: AxiosInstance
 
@@ -91,6 +92,51 @@ export async function addParticipant(messageId: string, participantId: string): 
 export async function removeParticipant(messageId: string, participantId: string): Promise<Session> {
     try {
         const { data } = await apiClient.delete<Session>(`/session/${messageId}/${participantId}`)
+        return data
+    } catch (e) {
+        if (e.response.status === 404) {
+            return null
+        }
+        throw e
+    }
+}
+
+export async function getCampaignById(id: string): Promise<Campaign> {
+    try {
+        const { data } = await apiClient.get<Campaign>(`/campaign/${id}`)
+        return data
+    } catch (e) {
+        if (e.response.status === 404) {
+            return null
+        }
+        throw e
+    }
+}
+
+export async function getCampaignByOwner(id: string): Promise<Campaign[]> {
+    try {
+        const { data } = await apiClient.get<Campaign[]>(`/campaign/owner/${id}`)
+        return data
+    } catch (e) {
+        if (e.response.status === 404) {
+            return null
+        }
+        throw e
+    }
+}
+
+export async function addCampaign(campaign: Campaign): Promise<Campaign> {
+    try {
+        const { data } = await apiClient.post<Campaign>(`/campaign`, { ...campaign })
+        return data
+    } catch (e) {
+        throw e
+    }
+}
+
+export async function updateCampaign(campaign: Partial<Campaign>): Promise<Session> {
+    try {
+        const { data } = await apiClient.patch<Session>(`/campaign/${campaign._id}`, { ...campaign })
         return data
     } catch (e) {
         if (e.response.status === 404) {

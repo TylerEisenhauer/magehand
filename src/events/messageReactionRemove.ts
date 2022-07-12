@@ -40,5 +40,4 @@ export default async function messageReactionRemove(reaction: MessageReaction, u
     } catch (e) {
         logger.error(e)
     }
-
 }

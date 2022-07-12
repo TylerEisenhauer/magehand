@@ -3,7 +3,7 @@ import { Client, Guild, MessageEmbed, TextChannel } from 'discord.js'
 import { operation } from 'retry'
 import twilio from 'twilio'
 
-import { initializeMageHandClient } from '../api/magehand'
+import { initializeMageHandClient, updateSession } from '../api/magehand'
 import { buildSessionEmbed } from '../helpers/embeds'
 import { logger } from '../logger'
 import { Session } from '../types'
@@ -57,10 +57,23 @@ async function startQueue(client: Client) {
                         if (reminderChannel) {
                             const embed: MessageEmbed = buildSessionEmbed(session)
 
-                            reminderChannel.send({
-                                content: 'Session Reminder',
-                                embeds: [embed]
-                            })
+                            if (!session.messageId) {
+                                const message = await reminderChannel.send({
+                                    content: 'Session Scheduled, react if you can make it!',
+                                    embeds: [embed]
+                                })
+                                await updateSession({
+                                    _id: session._id,
+                                    messageId: message.id
+                                })
+                                await message.react('✅')
+                                await message.react('❌')
+                            } else {
+                                reminderChannel.send({
+                                    content: 'Session Reminder',
+                                    embeds: [embed]
+                                })
+                            }
                         }
                     }
                     channel.ack(msg)
