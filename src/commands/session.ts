@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { ChannelType } from 'discord-api-types/v9'
-import { ChatInputCommandInteraction, Message, EmbedBuilder, TextChannel } from 'discord.js'
+import { ChatInputCommandInteraction, Message, EmbedBuilder, TextChannel, ChannelType } from 'discord.js'
 import { DateTime } from 'luxon'
 
 import { createSession, getSessionById, updateSession } from '../api/magehand'

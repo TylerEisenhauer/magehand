@@ -1,5 +1,4 @@
-import { ChannelType } from 'discord-api-types/v9'
-import { ChatInputCommandInteraction, Message, SlashCommandBuilder } from 'discord.js'
+import { ChannelType, ChatInputCommandInteraction, Message, SlashCommandBuilder } from 'discord.js'
 import { DateTime } from 'luxon'
 
 import { addCampaign, updateCampaign } from '../api/magehand'

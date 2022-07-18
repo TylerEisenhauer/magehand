@@ -1,8 +1,7 @@
 import './config'
 
 import { REST } from '@discordjs/rest'
-import { Client, Collection, GatewayIntentBits, Partials } from 'discord.js'
-import { Routes } from 'discord-api-types/v10'
+import { Client, Collection, GatewayIntentBits, Partials, Routes } from 'discord.js'
 import fs from 'node:fs'
 import path from 'node:path'
 
