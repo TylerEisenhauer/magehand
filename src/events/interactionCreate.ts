@@ -1,9 +1,9 @@
-import { Interaction } from 'discord.js'
+import { ChatInputCommandInteraction, InteractionType } from 'discord.js'
 import { logger } from '../logger'
 import { ExtendedClient } from '../types'
 
-export default async function interactionCreate(interaction: Interaction) {
-    if (!interaction.isCommand()) return
+export default async function interactionCreate(interaction: ChatInputCommandInteraction) {
+    if (interaction.type !== InteractionType.ApplicationCommand) return
     
     try {
         const client: ExtendedClient = interaction.client

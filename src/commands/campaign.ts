@@ -1,6 +1,5 @@
-import { SlashCommandBuilder } from '@discordjs/builders'
 import { ChannelType } from 'discord-api-types/v9'
-import { CommandInteraction, Message } from 'discord.js'
+import { ChatInputCommandInteraction, Message, SlashCommandBuilder } from 'discord.js'
 import { DateTime } from 'luxon'
 
 import { addCampaign, updateCampaign } from '../api/magehand'
@@ -29,7 +28,7 @@ const slashCommand = new SlashCommandBuilder()
                 option
                     .setName('channel')
                     .setDescription('The channel to post session reminders in')
-                    .addChannelType(ChannelType.GuildText.valueOf())
+                    .addChannelTypes(ChannelType.GuildText)
                     .setRequired(true))
             .addStringOption(option =>
                 option
@@ -49,7 +48,7 @@ const slashCommand = new SlashCommandBuilder()
             .addStringOption(option =>
                 option
                     .setName('frequency')
-                    .addChoices(frequencyOptions)
+                    .addChoices(...frequencyOptions)
                     .setDescription('The session frequency')
                     .setRequired(true))
             .addIntegerOption(option =>
@@ -75,7 +74,7 @@ const slashCommand = new SlashCommandBuilder()
             .addStringOption(option =>
                 option
                     .setName('timezone')
-                    .addChoices(timezoneOptions)
+                    .addChoices(...timezoneOptions)
                     .setDescription('The timezone the session is for, defaults to America/Chicago')
                     .setRequired(false))
     )
@@ -90,7 +89,7 @@ const slashCommand = new SlashCommandBuilder()
                     .setRequired(true))
     )
 
-async function executeInteraction(interaction: CommandInteraction) {
+async function executeInteraction(interaction: ChatInputCommandInteraction) {
     switch (interaction.options.getSubcommand()) {
         case 'create':
             return await createCampaign(interaction)
@@ -101,7 +100,7 @@ async function executeInteraction(interaction: CommandInteraction) {
     }
 }
 
-async function createCampaign(interaction: CommandInteraction) {
+async function createCampaign(interaction: ChatInputCommandInteraction) {
     const name = interaction.options.getString('name')
     const description = interaction.options.getString('description')
     const channel = interaction.options.getChannel('channel').id
@@ -201,7 +200,7 @@ async function createCampaign(interaction: CommandInteraction) {
     await interaction.reply({ content: `Campaign Created! Reference Id: ${campaign._id}`, ephemeral: true })
 }
 
-async function endCampaign(interaction: CommandInteraction) {
+async function endCampaign(interaction: ChatInputCommandInteraction) {
     const id = interaction.options.getString('id')
     const campaign = await updateCampaign({
         _id: id,
@@ -215,7 +214,7 @@ async function endCampaign(interaction: CommandInteraction) {
 }
 
 async function execute(args: string[], message: Message) {
-    return await message.reply('The session commands can only be used via slash command')
+    return await message.reply('The campaign commands can only be used via slash command')
 }
 
 module.exports = {

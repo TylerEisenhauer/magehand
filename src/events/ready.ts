@@ -1,5 +1,5 @@
 import amqp from 'amqplib'
-import { Client, Guild, MessageEmbed, TextChannel } from 'discord.js'
+import { ActivityType, Client, EmbedBuilder, Guild, TextChannel } from 'discord.js'
 import { operation } from 'retry'
 import twilio from 'twilio'
 
@@ -15,7 +15,7 @@ export default async function ready(client: Client) {
         activities: [
             {
                 name: 'Dungeons and Dragons',
-                type: 'PLAYING'
+                type: ActivityType.Playing
             }
         ]
     })
@@ -55,7 +55,7 @@ async function startQueue(client: Client) {
                     if (guild) {
                         const reminderChannel: TextChannel = await guild.channels.fetch(session.channel) as TextChannel
                         if (reminderChannel) {
-                            const embed: MessageEmbed = buildSessionEmbed(session)
+                            const embed: EmbedBuilder = buildSessionEmbed(session)
 
                             if (!session.messageId) {
                                 const message = await reminderChannel.send({

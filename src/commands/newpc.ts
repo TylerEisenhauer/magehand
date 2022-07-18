@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { CommandInteraction, Message } from 'discord.js'
+import { ChatInputCommandInteraction, Message } from 'discord.js'
 
 import { randomInteger } from '../helpers/numbers'
 import { Command } from '../types'
@@ -8,7 +8,7 @@ const slashCommand = new SlashCommandBuilder()
     .setName('newpc')
     .setDescription('Roll stats for a new player character')
 
-async function executeInteraction(interaction: CommandInteraction) {
+async function executeInteraction(interaction: ChatInputCommandInteraction) {
     let rolls: number[][] = []
     for (let i = 0; i < 6; i++) {
         let set: number[] = []

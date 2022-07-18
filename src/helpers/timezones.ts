@@ -1,3 +1,5 @@
+import { APIApplicationCommandOptionChoice } from "discord.js"
+
 const timezoneList = [
     'America/Chicago',
     'America/New_York',
@@ -8,8 +10,11 @@ const timezoneList = [
     'America/Anchorage',
     'America/Adak',
     'Pacific/Honolulu'
-  ]
+]
 
-  export const timezoneOptions: [name: string, value: string][] = timezoneList.map(x => {
-      return [x, x]
-  })
+export const timezoneOptions: APIApplicationCommandOptionChoice<string>[] = timezoneList.map(x => {
+    return {
+        name: x,
+        value: x
+    }
+})
