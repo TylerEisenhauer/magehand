@@ -1,8 +1,7 @@
 import './config'
 
 import { REST } from '@discordjs/rest'
-import { Client, Collection, Intents } from 'discord.js'
-import { Routes } from 'discord-api-types/v9'
+import { Client, Collection, GatewayIntentBits, Partials, Routes } from 'discord.js'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -12,13 +11,17 @@ import { ExtendedClient, Command } from './types'
 
 const client: ExtendedClient = new Client({
     intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.DIRECT_MESSAGES,
-        Intents.FLAGS.DIRECT_MESSAGE_REACTIONS
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.DirectMessageReactions
     ],
-    partials: ['USER', 'REACTION', 'MESSAGE']
+    partials: [
+        Partials.User, 
+        Partials.Reaction, 
+        Partials.Message
+    ]
 })
 client.commands = new Collection()
 
@@ -42,7 +45,7 @@ client.on('interactionCreate', interactionCreate)
 client.login(process.env.DISCORD_TOKEN).then(() => {
     logger.info('Discord Login Success')
 
-    const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN)
+    const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN)
     if (process.env.NODE_ENV === 'production') {
         rest.put(Routes.applicationCommands(client.user.id), { body: commands })
             .then(() => logger.info('Successfully registered global application commands.'))

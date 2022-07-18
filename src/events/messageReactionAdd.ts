@@ -1,4 +1,4 @@
-import { MessageEmbed, MessageReaction, TextChannel, User } from 'discord.js'
+import { EmbedBuilder, MessageReaction, TextChannel, User } from 'discord.js'
 
 import { addParticipant, getSessionById } from '../api/magehand'
 import { buildSessionEmbed } from '../helpers/embeds'
@@ -28,7 +28,7 @@ export default async function messageReactionAdd(reaction: MessageReaction, user
                     const messageChannel = await reaction.client.channels.fetch(session.channel) as TextChannel
                     const message = await messageChannel.messages.fetch(session.messageId)
                     if (message.editable) {
-                        const embed: MessageEmbed = buildSessionEmbed(updatedSession)
+                        const embed: EmbedBuilder = buildSessionEmbed(updatedSession)
                         
                         await message.edit({ embeds: [embed] })
                     }

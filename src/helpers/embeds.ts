@@ -1,12 +1,12 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { Session } from "../types";
 
-const buildSessionEmbed = (session: Session): MessageEmbed => {
+const buildSessionEmbed = (session: Session): EmbedBuilder => {
     const mentions: string = session.participants.reduce((x, y,) => {
         return x + `<@${y}> `
     }, '')
 
-    const embed: MessageEmbed = new MessageEmbed()
+    const embed: EmbedBuilder = new EmbedBuilder()
         .setColor('#00FF00')
         .setAuthor({
             name: `${session.name}`

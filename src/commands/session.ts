@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { ChannelType } from 'discord-api-types/v9'
-import { CommandInteraction, Message, MessageEmbed, TextChannel } from 'discord.js'
+import { ChatInputCommandInteraction, Message, EmbedBuilder, TextChannel, ChannelType } from 'discord.js'
 import { DateTime } from 'luxon'
 
 import { createSession, getSessionById, updateSession } from '../api/magehand'
@@ -30,7 +29,7 @@ const slashCommand = new SlashCommandBuilder()
                 option
                     .setName('channel')
                     .setDescription('The channel to post reminders in')
-                    .addChannelType(ChannelType.GuildText.valueOf())
+                    .addChannelTypes(ChannelType.GuildText)
                     .setRequired(true))
             .addStringOption(option =>
                 option
@@ -50,7 +49,7 @@ const slashCommand = new SlashCommandBuilder()
             .addStringOption(option =>
                 option
                     .setName('timezone')
-                    .addChoices(timezoneOptions)
+                    .addChoices(...timezoneOptions)
                     .setDescription('The timezone the session is for, defaults to America/Chicago')
                     .setRequired(false))
     )
@@ -77,7 +76,7 @@ const slashCommand = new SlashCommandBuilder()
                 option
                     .setName('channel')
                     .setDescription('The channel to post reminders in')
-                    .addChannelType(ChannelType.GuildText.valueOf())
+                    .addChannelTypes(ChannelType.GuildText)
                     .setRequired(false))
             .addStringOption(option =>
                 option
@@ -97,7 +96,7 @@ const slashCommand = new SlashCommandBuilder()
             .addStringOption(option =>
                 option
                     .setName('timezone')
-                    .addChoices(timezoneOptions)
+                    .addChoices(...timezoneOptions)
                     .setDescription('The timezone the session is for, defaults to America/Chicago')
                     .setRequired(false))
     )
@@ -112,7 +111,7 @@ const slashCommand = new SlashCommandBuilder()
                     .setRequired(true))
     )
 
-async function executeInteraction(interaction: CommandInteraction) {
+async function executeInteraction(interaction: ChatInputCommandInteraction) {
     switch (interaction.options.getSubcommand()) {
         case 'schedule':
             return await scheduleSession(interaction)
@@ -125,7 +124,7 @@ async function executeInteraction(interaction: CommandInteraction) {
     }
 }
 
-async function scheduleSession(interaction: CommandInteraction) {
+async function scheduleSession(interaction: ChatInputCommandInteraction) {
     const name = interaction.options.getString('name')
     const channel = interaction.options.getChannel('channel').id
     const date = interaction.options.getString('date')
@@ -149,7 +148,7 @@ async function scheduleSession(interaction: CommandInteraction) {
 
     await interaction.reply({ content: 'Session Scheduled!', ephemeral: true })
 
-    const embed: MessageEmbed = buildSessionEmbed(session)
+    const embed: EmbedBuilder = buildSessionEmbed(session)
 
     const alertChannel = await interaction.guild.channels.fetch(channel) as TextChannel
     const message = await alertChannel.send({ content: 'Session Updated! React if you can make it', embeds: [embed] })
@@ -163,7 +162,7 @@ async function scheduleSession(interaction: CommandInteraction) {
     await message.react('❌')
 }
 
-async function editSession(interaction: CommandInteraction) {
+async function editSession(interaction: ChatInputCommandInteraction) {
     const id = interaction.options.getString('id')
     const name = interaction.options.getString('name')
     const channel = interaction.options.getChannel('channel')?.id
@@ -219,7 +218,7 @@ async function editSession(interaction: CommandInteraction) {
 
     await interaction.reply({ content: 'Session Updated!', ephemeral: true })
 
-    const embed: MessageEmbed = buildSessionEmbed(updatedSession)
+    const embed: EmbedBuilder = buildSessionEmbed(updatedSession)
 
     const alertChannel = await interaction.guild.channels.fetch(updatedSession.channel) as TextChannel
     const message = await alertChannel.send({ content: 'Session Updated! React if you can make it', embeds: [embed] })
@@ -233,7 +232,7 @@ async function editSession(interaction: CommandInteraction) {
     await message.react('❌')
 }
 
-async function cancelSession(interaction: CommandInteraction) {
+async function cancelSession(interaction: ChatInputCommandInteraction) {
     const id = interaction.options.getString('id')
     const session = await updateSession({
         _id: id,
@@ -243,11 +242,13 @@ async function cancelSession(interaction: CommandInteraction) {
     if (session) {
         const messageChannel = await interaction.client.channels.fetch(session.channel) as TextChannel
         const message = await messageChannel.messages.fetch(session.messageId)
+
         if (message.editable) {
-            const embed = message.embeds[0]
+            const embed = new EmbedBuilder(message.embeds[0].toJSON())
             embed.setColor('#FF0000')
             await message.edit({ content: 'This session has been cancelled', embeds: [embed] })
         }
+        
         return await interaction.reply({ content: 'Session canceled', ephemeral: true })
     }
     await interaction.reply({ content: 'Could not find session, check your session id', ephemeral: true })

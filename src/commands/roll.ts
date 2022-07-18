@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { CommandInteraction, Message } from 'discord.js'
+import { ChatInputCommandInteraction, Message } from 'discord.js'
 
 import { randomInteger } from '../helpers/numbers'
 import { logger } from '../logger'
@@ -14,16 +14,12 @@ const slashCommand = new SlashCommandBuilder()
     .addIntegerOption(o =>
         o.setName('dicetoroll')
             .setDescription('The dice to roll')
-            .addChoices([
-                ['d2', 2],
-                ['d4', 4],
-                ['d6', 6],
-                ['d8', 8],
-                ['d10', 10],
-                ['d12', 12],
-                ['d20', 20],
-                ['d100', 100]
-            ])
+            .addChoices(...allowedDie.map(x => {
+                return {
+                    name: `d${x}`,
+                    value: parseInt(x)
+                }
+            }))
             .setRequired(true))
     .addIntegerOption(o =>
         o.setName('numberofdice')
@@ -32,7 +28,7 @@ const slashCommand = new SlashCommandBuilder()
             .setMaxValue(100)
             .setRequired(false))
 
-async function executeInteraction(interaction: CommandInteraction) {
+async function executeInteraction(interaction: ChatInputCommandInteraction) {
     try {
         const numberToRoll: number = interaction.options.getInteger('numberofdice') ?? 1
         const dieToRoll: number = interaction.options.getInteger('dicetoroll')
